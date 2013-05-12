@@ -51,7 +51,7 @@ namespace WizardOfOz
         {
 
             //wirelessBelt.SetupPorts("COM14", "COM14", "9600", "8", "1", "None", 1000);
-            wirelessBelt.SetupPorts(inPort, outPort, "9600", "8", "1", "None", 1000);
+            wirelessBelt.SetupPorts(inPort, outPort, "9600", "8", "1", "None", 10000);
             wirelessBelt.OpenPorts();
             status = "";
             if (wirelessBelt.getStatus() != error_t.ESUCCESS)
@@ -72,37 +72,7 @@ namespace WizardOfOz
                 Console.WriteLine(status);
                 return connected;
             }
-            try
-            {
-                error_t response = wirelessBelt.Query_All();
-                if (response != error_t.ESUCCESS)
-                    status += wirelessBelt.getErrorMsg(response);
-                else
-                {
-                    status += "Query success";
-                    Console.WriteLine(status);
-                    connected = true;
-                    String[] motor = { wirelessBelt.getMotors(QueryType.PREVIOUS).ToString() };
-                    ActiveTactons = new bool[motor.Length];
-                    //// brackets reqd for casting int array to string array
-                    //String[] motor = { wirelessBelt.getMotors(QueryType.PREVIOUS).ToString() };
-                    //String[] rhythm = wirelessBelt.getRhythm(false, QueryType.PREVIOUS);
-                    //String[] magnitude = wirelessBelt.getMagnitude(false, QueryType.PREVIOUS);
-                    //wirelessBelt.Vibrate_Motor(1, 1, 1, 7);
-                }
-            }
-            catch (Exception ex)
-            {
-                status += wirelessBelt.getStatusBufferStr() + " " + ex.Message;
-                Console.WriteLine(status);
-                error_t response = wirelessBelt.ResetHapticBelt();
-
-                if (response != error_t.ESUCCESS)
-                {
-                    Console.WriteLine(wirelessBelt.getErrorMsg(response));
-                }
-                wirelessBelt.ClosePorts();
-            }
+            connected = true;
             return connected;
         }
 
@@ -115,12 +85,14 @@ namespace WizardOfOz
         }
 
         [MethodImpl(MethodImplOptions.Synchronized)]
-        public void play(byte motor, byte rhythm, byte magnitude, byte dutyCycle)
+        public error_t play(byte motor, byte rhythm, byte magnitude, byte dutyCycle)
         {
+            error_t status = error_t.EMAX;
             if (connected)
             {
-                wirelessBelt.Vibrate_Motor(motor, rhythm, magnitude, dutyCycle);
+                status = wirelessBelt.Vibrate_Motor(motor, rhythm, magnitude, dutyCycle);
             }
+            return status;
         }
         public string Start(string szTactons, string szPatterns)
         {
@@ -164,18 +136,25 @@ namespace WizardOfOz
             return status;
         }
 
-        public void Stop(string szTactons)
+        public error_t Stop(string szTactons)
         {
+            error_t status = error_t.EMAX;
             string[] tactons = szTactons.Split(' ', ',');
             for (int i = 0; i < tactons.Length; i++)
             {
-                wirelessBelt.Stop(Byte.Parse(tactons[i]));
+                status = wirelessBelt.Stop(Byte.Parse(tactons[i]));
             }
+            return status;
         }
 
-        public void StopAll()
+        public error_t StopAll()
         {
-            wirelessBelt.StopAll();
+            return wirelessBelt.StopAll();
+        }
+
+        public string getErrorMsg(error_t status)
+        {
+            return wirelessBelt.getErrorMsg(status);
         }
     }
 }

@@ -8,6 +8,7 @@ using System.Text;
 using System.Windows.Forms;
 using System.Collections;
 using System.IO;
+using HapticDriver;
 
 namespace WizardOfOz
 {
@@ -19,7 +20,7 @@ namespace WizardOfOz
         public Form1()
         {
             InitializeComponent();
-
+            disconnectButton.Enabled = false;
             // Populate list of available COM ports.
             ArrayList myPortList = new ArrayList();
             foreach (string name in System.IO.Ports.SerialPort.GetPortNames())
@@ -42,10 +43,14 @@ namespace WizardOfOz
 
         private void connectButton_Click(object sender, EventArgs e)
         {
-            beltCommand = new Mediator(inputComPort.Text, outputComPort.Text);
-            beltCommand.Connect();
             connectButton.Enabled = false;
-            disconnectButton.Enabled = true;
+            beltCommand = new Mediator(inputComPort.Text, outputComPort.Text);
+            if (beltCommand.Connect())
+            {
+                disconnectButton.Enabled = true;
+            }
+            else
+                connectButton.Enabled = true;
         }
 
         private void disconnectButton_Click(object sender, EventArgs e)
@@ -53,20 +58,25 @@ namespace WizardOfOz
             beltCommand.Disconnect();
             connectButton.Enabled = true;
             disconnectButton.Enabled = false;
+            display.Text = "";
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
-            // motor 2, pattern 0, magnitude 0, duty cycle 1
-            beltCommand.play(2, 4, 0, 1);
-            beltCommand.play(3, 4, 0, 1);
-            beltCommand.play(1, 4, 0, 1);
+            error_t status; ;
+            // motor 2, rythym 4, magnitude 0, cycles 1
+            status = beltCommand.play(2, 4, 0, 1);
+            if(status==error_t.ESUCCESS)
+            status = beltCommand.play(3, 4, 0, 1);
+            if (status == error_t.ESUCCESS)
+            status = beltCommand.play(1, 4, 0, 1);
             DateTime now = DateTime.Now;
 
             if (recording)
             {
                 dataStreamRecorder.WriteLine(now.ToString("G") + ": LEAN FORWARD");
             }
+            display.Text = beltCommand.getErrorMsg(status);
         }
 
         private void button2_Click(object sender, EventArgs e)

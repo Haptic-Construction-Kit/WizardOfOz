@@ -40,6 +40,7 @@
             this.button4 = new System.Windows.Forms.Button();
             this.recordButton = new System.Windows.Forms.Button();
             this.stopRecordButton = new System.Windows.Forms.Button();
+            this.display = new System.Windows.Forms.TextBox();
             this.SuspendLayout();
             // 
             // inputComPort
@@ -160,11 +161,20 @@
             this.stopRecordButton.UseVisualStyleBackColor = true;
             this.stopRecordButton.Click += new System.EventHandler(this.button6_Click);
             // 
+            // display
+            // 
+            this.display.Location = new System.Drawing.Point(33, 262);
+            this.display.Name = "display";
+            this.display.ReadOnly = true;
+            this.display.Size = new System.Drawing.Size(196, 20);
+            this.display.TabIndex = 12;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(274, 273);
+            this.ClientSize = new System.Drawing.Size(274, 294);
+            this.Controls.Add(this.display);
             this.Controls.Add(this.stopRecordButton);
             this.Controls.Add(this.recordButton);
             this.Controls.Add(this.button4);
@@ -198,6 +208,7 @@
         private System.Windows.Forms.Button button4;
         private System.Windows.Forms.Button recordButton;
         private System.Windows.Forms.Button stopRecordButton;
+        private System.Windows.Forms.TextBox display;
 
     }
 }
